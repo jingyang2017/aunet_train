@@ -119,7 +119,7 @@ def main():
             callback_logging(global_step, losses, acces, f1es, epoch, optimizer)
 
         val_results = callback_validation(epoch, model)
-        callback_checkpoint(epoch, model)
+        torch.save(model.module.predictor.state_dict(), os.path.join(args.output, "backbone_%d.pth"%epoch))
         lr_change(epoch+1,optimizer)
 
 if __name__ == '__main__':
