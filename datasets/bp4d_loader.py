@@ -105,6 +105,8 @@ class bp4d_load(data.Dataset):
             center[1] += dy * center[1]
             mat = get_transform(center, scale, (im_w, im_w), aug_rot)[:2]
             img = cv2.warpAffine(img, mat, (im_w, im_w))
+        else:
+            raise NotImplementedError()
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(img)
         img = self.transform(img)

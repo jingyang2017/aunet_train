@@ -25,7 +25,6 @@ parser.add_argument('--model', type=str, default='EmoNet')
 parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
 parser.add_argument('--wd', type=float, default=0, help='weight decay')
 parser.add_argument('--scale', type=float, default=260, help='scale in crop')
-parser.add_argument('--rect', action='store_true', help='use rect to crop data')
 
 def main():
     args = parser.parse_args()
@@ -55,12 +54,12 @@ def main():
 
     print('loading train set')
     train_data = bp4d_load(data_name=args.data, phase='train', subset=args.subset, transforms=transform_train,
-                          scale=args.scale, rect=args.rect, seed=manualSeed)
+                          scale=args.scale, rect=True, seed=manualSeed)
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batchsize, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
     au_weights = torch.from_numpy(train_data.AU_weight).float().cuda()
 
     print('loading val set')
-    val_data = bp4d_load(data_name=args.data, phase='test', subset=args.subset, transforms=transform_valid_noflip,scale=args.scale, rect=args.rect)
+    val_data = bp4d_load(data_name=args.data, phase='test', subset=args.subset, transforms=transform_valid_noflip,scale=args.scale, rect=True)
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=args.batchsize, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     if args.model == 'emonet':
