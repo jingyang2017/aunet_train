@@ -1,12 +1,4 @@
-import os
-import pickle
-import math
-import tqdm
 import torch
-import numpy as np
-from sklearn.metrics import accuracy_score, f1_score
-import torch.nn.functional as F
-
 
 def get_f1(y_labels,outputs):
     # f1_ = F1(y_labels,outputs, F1_Thresh=0.5)
@@ -55,56 +47,7 @@ def get_acc(y_labels,outputs):
     acc = pr_rt / outputs.shape[0]
     return acc
 
-def F1(gt,pred,F1_Thresh=0.5):
-    """Evaluates the IF1_SCORE
-    """
-    pred = torch.sigmoid(pred)
-    gt = gt.numpy()
-    pred = pred.numpy()
-    gt = gt.transpose((1, 0))
-    pred = pred.transpose((1, 0))
-    preds = np.zeros(pred.shape)
-    preds[pred < F1_Thresh] = 0
-    preds[pred >= F1_Thresh] = 1
-    F1=[]
-    for ii in range(gt.shape[0]):
-        output = preds[ii]
-        gt_ = gt[ii]
-        temp = f1_score(gt_,output)
-        F1.append(temp)
-    return F1
-
-def ACC(ground_truth,predictions):
-    """Evaluates the mean accuracy
-    """
-    return np.mean(ground_truth.astype(int) == predictions.astype(int))
 
 
 
-def ICC(labels,predictions):
-    """Evaluates the ICC(3, 1)
-    """
-    naus = predictions.shape[1]
-    icc = np.zeros(naus)
-    n = predictions.shape[0]
-    for i in range(0,naus):
-        a = np.asmatrix(labels[:,i]).transpose()
-        b = np.asmatrix(predictions[:,i]).transpose()
-        dat = np.hstack((a, b))
-        mpt = np.mean(dat, axis=1)
-        mpr = np.mean(dat, axis=0)
-        tm  = np.mean(mpt, axis=0)
-        BSS = np.sum(np.square(mpt-tm))*2
-        BMS = BSS/(n-1)
-        RSS = np.sum(np.square(mpr-tm))*n
-        tmp = np.square(dat - np.hstack((mpt,mpt)))
-        WSS = np.sum(np.sum(tmp, axis=1))
-        ESS = WSS - RSS
-        EMS = ESS/(n-1)
-        icc[i] = (BMS - EMS)/(BMS + EMS)
-    return icc
 
-def MAE(ground_truth,predictions):
-    """Evaluates the Mean Absolute Error.
-    """
-    return np.mean(np.abs(ground_truth-predictions))
