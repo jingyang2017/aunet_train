@@ -33,9 +33,10 @@ def main():
     random.seed(manualSeed)
     torch.manual_seed(manualSeed)
     torch.cuda.manual_seed_all(manualSeed)
+
     cur_path = os.path.abspath(os.curdir)
 
-    if args.data=='bp4d':
+    if args.data ==' bp4d':
         args.nclasses=12
     else:
         raise ValueError()
@@ -49,7 +50,7 @@ def main():
     log_root = logging.getLogger()
     init_logging(log_root, args.output)
 
-    transform_train = transforms.Compose([transforms.RandomHorizontalFlip(),transforms.ToTensor()])
+    transform_train = transforms.Compose([transforms.RandomHorizontalFlip(), transforms.ToTensor()])
     transform_valid_noflip = transforms.Compose([transforms.ToTensor()])
 
     print('loading train set')
@@ -62,8 +63,6 @@ def main():
     val_data = bp4d_load(data_name=args.data, phase='test', subset=args.subset, transforms=transform_valid_noflip,scale=args.scale, rect=args.rect)
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=args.batchsize, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
-
-
     if args.model == 'emonet':
         model = EmoNet(n_classes=args.nclasses)
     else:
@@ -73,14 +72,9 @@ def main():
     params = list(model.parameters())
     sub_params = [p for p in params if p.requires_grad]
     print('num of params', sum(p.numel() for p in sub_params))
-    if args.optim == 'adamw':
-        optimizer = torch.optim.AdamW(sub_params, lr=args.lr, betas=(0.9, 0.999), weight_decay=args.wd)
-    else:
-        raise ValueError()
-
+    optimizer = torch.optim.AdamW(sub_params, lr=args.lr, betas=(0.9, 0.999), weight_decay=args.wd)
     total_step = int(len(train_data) / args.batchsize * args.epochs)
     callback_logging = CallBackLogging(len(train_loader)//4, total_step, args.batchsize, None)
-    callback_checkpoint = CallBackModelCheckpoint(args.output)
     callback_validation = CallBackEvaluation(val_loader, None, subset='val')
     criterion = nn.BCEWithLogitsLoss(pos_weight=au_weights)
     # training
@@ -119,7 +113,7 @@ def main():
             callback_logging(global_step, losses, acces, f1es, epoch, optimizer)
 
         val_results = callback_validation(epoch, model)
-        torch.save(model.module.predictor.state_dict(), os.path.join(args.output, "backbone_%d.pth"%epoch))
+        torch.save(model.module.predictor.state_dict(), os.path.join(args.output, "predictor_%d.pth"%epoch))
         lr_change(epoch+1,optimizer)
 
 if __name__ == '__main__':
