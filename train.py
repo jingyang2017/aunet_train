@@ -9,7 +9,7 @@ from torchvision import transforms
 from datasets.bp4d_loader import bp4d_load
 from models.emonet_split import EmoNet
 from utils.utils_logging import AverageMeter, init_logging
-from utils.utils_callbacks import CallBackEvaluation, CallBackLogging, CallBackModelCheckpoint
+from utils.utils_callbacks import CallBackEvaluation, CallBackLogging
 from utils.utils import lr_change
 from utils.metrics import get_acc, get_f1
 
