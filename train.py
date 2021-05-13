@@ -49,7 +49,7 @@ def main():
     log_root = logging.getLogger()
     init_logging(log_root, args.output)
 
-    transform_train = transforms.Compose([transforms.ToTensor()])
+    transform_train = transforms.Compose([transforms.RandomHorizontalFlip(),transforms.ToTensor()])
     transform_valid_noflip = transforms.Compose([transforms.ToTensor()])
 
     print('loading train set')
