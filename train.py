@@ -21,7 +21,7 @@ parser.add_argument('--epochs', type=int, default=12, metavar='N', help='trainin
 parser.add_argument('--num_workers', type=int, default=4, metavar='N', help='5,8')
 parser.add_argument('--data', type=str, default='bp4d', choices=['bp4d'])
 parser.add_argument('--subset', type=int, default=1,choices=[1,2,3])
-parser.add_argument('--model', type=str, default='EmoNet')
+parser.add_argument('--model', type=str, default='emonet')
 parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
 parser.add_argument('--wd', type=float, default=0, help='weight decay')
 parser.add_argument('--scale', type=float, default=260, help='scale in crop')
