@@ -1,0 +1,58 @@
+#delete cpu numpy in def __call__(self, epoch, model):
+def get_f1(y_labels, outputs):
+    """F1 takes into acount only labels 0 and 1. -1 is masked out"""
+    #prepare predictions and labels
+    outputs = outputs.detach().data.cpu()
+    outputs = np.array(outputs)
+    preds = (outputs >= 0).astype(np.int32)
+
+    labels = y_labels.detach().data.cpu()
+    labels = np.array(labels)
+    
+    #caculate confmats
+    confmats = np.zeros((labels.shape[1], 2, 2), dtype=np.int32)
+    for idx, confmat in enumerate(confmats):
+        valid_indices = np.where(labels[:, idx] >= 0)
+        for gt in range(confmat.shape[0]):
+            for pred in range(confmat.shape[1]):
+                confmat[gt, pred] = np.logical_and(
+                    labels[valid_indices, idx] == gt,
+                    preds[valid_indices, idx] == pred).sum()
+    #caculate f1s
+    precisions = np.zeros(shape=confmats.shape[:2], dtype=float)
+    recalls = np.zeros(shape=confmats.shape[:2], dtype=float)
+    for cls in range(confmats.shape[1]):
+        precisions[:, cls] = confmats[:, cls, cls].astype(float) / np.clip(
+            confmats[:, :, cls].sum(axis=-1), np.finfo(float).eps, None)
+        recalls[:, cls] = confmats[:, cls, cls].astype(float) / np.clip(
+            confmats[:, cls, :].sum(axis=-1), np.finfo(float).eps, None)
+    f1s = 2.0 * precisions * recalls / np.clip(precisions + recalls, np.finfo(float).eps, None)
+    return np.mean(f1s,axis=-1)
+    
+    
+def get_acc(y_labels, outputs):
+    """acc takes into acount only labels 0 and 1. -1 is masked out"""
+    #prepare predictions and labels
+    outputs = outputs.detach().data.cpu()
+    outputs = np.array(outputs)
+    preds = (outputs >= 0).astype(np.int32)
+    
+    labels = y_labels.detach().data.cpu()
+    labels = np.array(labels)
+    
+    #caculate confmats
+    confmats = np.zeros((labels.shape[1], 2, 2), dtype=np.int32)
+    for idx, confmat in enumerate(confmats):
+        valid_indices = np.where(labels[:, idx] >= 0)
+        for gt in range(confmat.shape[0]):
+            for pred in range(confmat.shape[1]):
+                confmat[gt, pred] = np.logical_and(
+                    labels[valid_indices, idx] == gt,
+                    preds[valid_indices, idx] == pred).sum()
+                
+    #caculate precision
+    precisions = np.zeros(shape=confmats.shape[:2], dtype=float)
+    for cls in range(confmats.shape[1]):
+        precisions[:, cls] = confmats[:, cls, cls].astype(float) / np.clip(
+            confmats[:, :, cls].sum(axis=-1), np.finfo(float).eps, None)
+    return np.mean(precisions,axis=-1)
