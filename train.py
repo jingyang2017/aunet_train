@@ -75,7 +75,7 @@ def main():
     total_step = int(len(train_data) / args.batchsize * args.epochs)
     callback_logging = CallBackLogging(len(train_loader)//4, total_step, args.batchsize, None)
     callback_validation = CallBackEvaluation(val_loader, None, subset='val')
-    criterion = nn.BCEWithLogitsLoss(pos_weight=au_weights)
+    criterion = nn.BCEWithLogitsLoss(weight=au_weights)
     # training
     global_step = 0
     losses = AverageMeter()
