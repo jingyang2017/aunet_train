@@ -68,6 +68,7 @@ class bp4d_load(data.Dataset):
 
             if self.phase=='train':
                 # balance weights
+                # this weight is from JAANet. We need to change it for internal data.
                 AUoccur_rate = np.zeros((1, self.label_list.shape[1]))
                 for i in range(self.label_list.shape[1]):
                     AUoccur_rate[0, i] = sum(self.label_list[:, i] > 0) / float(self.label_list.shape[0])
