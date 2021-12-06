@@ -56,7 +56,8 @@ def main():
     train_data = bp4d_load(data_name=args.data, phase='train', subset=args.subset, transforms=transform_train,
                           scale=args.scale, rect=True, seed=manualSeed)
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batchsize, shuffle=True, num_workers=args.num_workers, pin_memory=True, drop_last=True)
-    au_weights = torch.from_numpy(train_data.AU_weight).float().cuda()
+    pos_weights = torch.from_numpy(train_data.pos_weight).float().cuda()
+    au_weights = torch.from_numpy(train_data.au_weight).float().cuda()
 
     print('loading val set')
     val_data = bp4d_load(data_name=args.data, phase='test', subset=args.subset, transforms=transform_valid_noflip,scale=args.scale, rect=True)
@@ -75,7 +76,7 @@ def main():
     total_step = int(len(train_data) / args.batchsize * args.epochs)
     callback_logging = CallBackLogging(len(train_loader)//4, total_step, args.batchsize, None)
     callback_validation = CallBackEvaluation(val_loader, None, subset='val')
-    criterion = nn.BCEWithLogitsLoss(weight=au_weights)
+    criterion = nn.BCEWithLogitsLoss(weight=au_weights,pos_weight=pos_weights)
     # training
     global_step = 0
     losses = AverageMeter()
