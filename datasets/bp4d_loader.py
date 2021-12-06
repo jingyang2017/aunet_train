@@ -69,11 +69,20 @@ class bp4d_load(data.Dataset):
             if self.phase=='train':
                 # balance weights
                 # this weight is from JAANet. We need to change it for internal data.
-                AUoccur_rate = np.zeros((1, self.label_list.shape[1]))
+#                 AUoccur_rate = np.zeros((1, self.label_list.shape[1]))
+#                 for i in range(self.label_list.shape[1]):
+#                     AUoccur_rate[0, i] = sum(self.label_list[:, i] > 0) / float(self.label_list.shape[0])
+#                 AU_weight = 1.0 / AUoccur_rate
+#                 self.AU_weight = AU_weight / AU_weight.sum() * AU_weight.shape[1]
+                pos_weight = np.zeros((1, self.label_list.shape[1]))
+                au_weight = np.zeros((1, self.label_list.shape[1]))
                 for i in range(self.label_list.shape[1]):
-                    AUoccur_rate[0, i] = sum(self.label_list[:, i] > 0) / float(self.label_list.shape[0])
-                AU_weight = 1.0 / AUoccur_rate
-                self.AU_weight = AU_weight / AU_weight.sum() * AU_weight.shape[1]
+                    pos_weight[0, i] = sum(self.label_list[:, i] == 0) / float(sum(self.label_list[:, i] == 1))
+                    au_weight[0,i] = 0.5/(sum(self.label_list[:, i] == 0) / float(sum(self.label_list[:, i] == 0)+sum(self.label_list[:, i] == 1)))
+#                     au_weight[0,i] = 0.5/(sum(self.label_list[:, i] == 0) / float(self.label_list.shape[0]))
+                self.pos_weight = pos_weight
+                self.au_weight = au_weight
+            
         else:
             raise NotImplementedError()
 
